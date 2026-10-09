@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CONTACT module at scale</title>
+  <style>
+    :root { color-scheme: light dark; --bg: #fafaf8; --fg: #232b32; --muted: #59636d; --line: #d5dbdf; --panel: #eff3f5; --accent: #8a5e16; --question: #fff7e8; }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #171b20; --fg: #e3e8ec; --muted: #acb7c0; --line: #3a4651; --panel: #222b33; --accent: #e2b264; --question: #2b251b; }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--fg); font: 17px/1.6 system-ui, sans-serif; }
+    header, main { max-width: 900px; margin: auto; padding: 28px; }
+    header { padding-bottom: 0; }
+    h1 { font-size: 2rem; line-height: 1.2; margin: 12px 0 24px; }
+    h2 { font-size: 1.4rem; margin: 0 0 16px; }
+    h3 { font-size: 1.05rem; margin: 20px 0 8px; }
+    blockquote { margin: 0 0 20px; padding: 12px 18px; border-left: 3px solid var(--line); background: var(--panel); }
+    section { border-top: 1px solid var(--line); margin: 26px 0; padding-top: 24px; }
+    li { margin: 10px 0; }
+    ul { padding-left: 24px; }
+    code { font-size: .9em; background: var(--panel); padding: 1px 4px; border-radius: 3px; }
+    summary { cursor: pointer; font-weight: 600; }
+    details { padding: 14px 18px; background: var(--panel); border-radius: 6px; }
+    .date { color: var(--muted); font-size: .85rem; margin-top: 18px; }
+    .unresolved { border-top: 3px solid var(--accent); }
+    .questions { margin-top: 22px; border-left: 3px solid var(--accent); background: var(--question); }
+    @media (max-width: 600px) { header, main { padding: 20px; } body { font-size: 16px; } }
+    @media print { body { font-size: 11pt; } header, main { max-width: none; } details { break-inside: avoid; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>CONTACT module at scale</h1>
+    <blockquote>Let's port this set of scripts into an importable module that can be run at scale.</blockquote>
+    <details>
+      <summary>Refined prompt clarifications</summary>
+      <ul>
+        <li>Cover the complete workflow, including pathway generation and network extraction.</li>
+        <li>Support processing many independent inputs on a cluster or batch scheduler.</li>
+        <li>Provide in-memory analysis results, machine-readable pathways/networks/counts, and network PNGs.</li>
+        <li>Preserve documented scientific rules, fix implementation bugs, and document differences from legacy behavior.</li>
+        <li>Include the original paper’s DHFR example if suitable source data can be found.</li>
+        <li>Begin with prepared multi-conformer structures; keep model building, refinement, and hydrogen placement external.</li>
+        <li>Provide a Python API and command-line interface for externally scheduled jobs or job arrays, without built-in job orchestration.</li>
+        <li>Validate the DHFR example against published network membership and pathway counts; allow PNG appearance to differ.</li>
+        <li>Default to networks containing at least three residues, documenting the difference from the paper.</li>
+        <li>Return partial results with an unmistakable truncation status when enumeration reaches a resource limit.</li>
+        <li>Accept both PDB and mmCIF structure files.</li>
+        <li>Support both chain-local and cross-chain pathway discovery, preserving chain and insertion-code identity throughout results.</li>
+        <li>Default to clash percentile 0.30, maximum pathway length 100, all-atom analysis, and relief threshold 0.90, with user-selectable settings and side-chain-only mode.</li>
+        <li>Export complete structured results as JSON and routine analysis tables as CSV.</li>
+        <li>Use chain-local searches by default; make cross-chain discovery opt-in.</li>
+        <li>Optionally construct a user-selected biological assembly from structure-file metadata through a flag or argument.</li>
+        <li>Analyze model 1 by default, with explicit model selection available.</li>
+        <li>Reject inputs without hydrogen atoms by default, with explicit opt-in to hydrogen-free analysis.</li>
+        <li>Return a distinct nonzero CLI exit status for truncated runs while retaining partial outputs.</li>
+        <li>Include optimizations for scalable execution in the plan.</li>
+      </ul>
+    </details>
+    <p class="date">Generated <time datetime="2026-10-08T23:01:32Z">2026-10-08T23:01:32Z</time> · Concise template · Planning only</p>
+  </header>
+  <main>
+    <section id="overview">
+      <h2>Overview</h2>
+      <ul>
+        <li><strong>Deliver the full CONTACT analysis.</strong> Turn the repository’s Python 2 network extractor and the original supplementary pathway generator into an installable modern Python package with an import-safe API and a matching CLI.</li>
+        <li><strong>Make scientific compatibility explicit.</strong> Preserve documented clash, relief, alternate-conformation, and pathway rules; distinguish bug corrections and requested extensions from legacy behavior. Reconcile source-versus-paper discrepancies before declaring reproduction successful.</li>
+        <li><strong>Scale by independent inputs.</strong> Support headless, isolated analyses under external schedulers. No embedded job manager, model-building pipeline, or automatic hydrogen preparation.</li>
+        <li><strong>Keep results reusable and auditable.</strong> Expose pathways, weighted networks, and counts in memory; export JSON, CSV, and optional PNGs with parameters, provenance, and completion status.</li>
+        <li><strong>Optimize exact computation, not the science.</strong> Address contact-search cost, pathway enumeration, postprocessing, graph aggregation, and output overhead. Accept optimizations only with correctness comparisons and measured runtime/memory evidence.</li>
+      </ul>
+    </section>
+    <section id="expected-behavior">
+      <h2>Expected behavior</h2>
+      <ul>
+        <li><strong>Inputs and preparation:</strong> accept prepared PDB or mmCIF structures. Select model 1 unless another model is requested; do not mix models. Reject inputs with no hydrogen atoms unless hydrogen-free analysis is explicitly enabled and recorded. Hydrogen presence alone does not certify complete or correct placement.</li>
+        <li><strong>Search scope:</strong> search within each chain by default, without merging equal residue numbers across chains. Cross-chain mode searches the selected structure as a whole. Biological assembly expansion is separately opt-in and requires an explicit assembly identifier; missing assembly metadata is an error, not a silent fallback.</li>
+        <li><strong>Identity and chemistry:</strong> retain model, chain, residue number, insertion code, alternate conformation, and assembly-copy identity. Keep ligands/cofactors relevant to CONTACT, particularly NADP in DHFR. Assembly copies remain distinct even when original residue identifiers match.</li>
+        <li><strong>Defaults:</strong> clash percentile <code>0.30</code>, maximum pathway length <code>100</code>, all-atom analysis, relief threshold <code>0.90</code>, and minimum network size <code>3</code>. Expose the scientific settings, side-chain-only mode, and existing pathway-length/residue filters through the API and CLI.</li>
+        <li><strong>Pathways and networks:</strong> preserve ordered pathway sequences and the original contiguous-subpath elimination rule; do not collapse paths merely because they contain the same residue set. Reject a whole pathway when a required relief is below threshold. Handle the initial no-predecessor relief marker separately from genuine zero relief. Build weighted residue connections and remove components below the configured network minimum.</li>
+        <li><strong>Counts:</strong> distinguish raw candidate pathways, postprocessed residue pathways, relief-filtered pathways, network-associated counts, and residue occurrences. Document edge-weight counting semantics, including repeated transitions. Do not label the supplied DHFR log’s 157 postprocessed paths as 157 relief-filtered paths without verification.</li>
+        <li><strong>Results and exports:</strong> in-memory results and JSON/CSV describe the same analysis. Include settings, source/model/assembly selection, identity mapping, software version, count definitions, and run status. PNG generation is optional and headless; appearance need not match legacy layouts.</li>
+        <li><strong>Cluster execution:</strong> importing the package performs no analysis or plotting. Each CLI invocation has an explicit output location and avoids shared scratch names, input overwrites, and color-based filename collisions. Equivalent inputs and settings yield deterministic scientific results.</li>
+        <li><strong>Bounded execution:</strong> controlled enumeration/resource limits return clearly marked partial results and a distinct nonzero CLI status. Report the stopping reason and scope already processed; partial counts are not exhaustive counts. Ordinary failures remain distinguishable from truncation. Abrupt scheduler termination cannot guarantee recoverable output.</li>
+        <li><strong>DHFR reproduction:</strong> use the supplied prepared WT structure, detailed pathways, residue-only pathways, and run log as reference artifacts. Check published pathway counts and network membership with matched settings, including the paper’s four-residue minimum separately from the three-residue default. Validate new cross-chain and assembly behavior independently.</li>
+      </ul>
+    </section>
+    <section id="changes" class="unresolved">
+      <h2>Changes</h2>
+      <ul>
+        <li><strong>Package and entry points:</strong> introduce packaging, documented installation, an importable analysis API, and a CLI backed by the same behavior. Modernize the Python 2 extractor and obsolete NetworkX usage. Keep visualization dependencies out of compute-only use and avoid reliance on obsolete bundled executables.</li>
+        <li><strong>Recover the upstream workflow:</strong> incorporate the MIT-licensed supplementary CONTACT source with attribution. Establish a reference run before replacing its pathway-generation behavior; document any native build/runtime requirements rather than hiding them behind the Python interface.</li>
+        <li><strong>Structure handling:</strong> add consistent PDB/mmCIF interpretation, model selection, identity-preserving chain scope, and optional assembly expansion. Preserve blank/shared atoms and alternate-conformation semantics; reject ambiguous identities rather than silently merging residues.</li>
+        <li><strong>Scientific baseline and migration notes:</strong> audit radii, percentile/tie handling, hydrogen-bond and cysteine exclusions, relief markers, path-length boundaries, and subpath removal against the paper and source. Document corrected EOF handling, empty pathways, ineffective component filtering, chain-number collisions, and output overwrites. Keep evidence of legacy differences rather than changing reference expectations silently.</li>
+        <li><strong>Structured, isolated output:</strong> add JSON/CSV exports, status/provenance, safe per-run output locations, and optional collision-free PNGs. Document scheduler/job-array usage and the complete/truncated/error contract.</li>
+      </ul>
+      <h3>Optimizations included</h3>
+      <ul>
+        <li><strong>Contact evaluation:</strong> avoid exhaustive atom-pair work and dense all-conformer storage where exact geometric pruning is possible. Preserve all interactions required for relief decisions, the clash-percentile population, and threshold ties; absence from a clash candidate list must not mean absence of a relief interaction.</li>
+        <li><strong>Pathway generation:</strong> reuse unchanged contact calculations and reduce repeated copying, file reopening, and serialization during enumeration. Keep output ordering stable enough for reproducible partial runs. No approximate search, random sampling, or unproven pruning.</li>
+        <li><strong>Pathway postprocessing:</strong> reduce repeated pairwise containment work and duplicate storage while preserving ordered contiguous-subpath semantics and the original treatment of reversed paths.</li>
+        <li><strong>Network extraction:</strong> eliminate full-graph scans for each pathway edge, repeated membership scans, and unnecessary retained pathway copies. Aggregate weights and connected components efficiently without changing count definitions.</li>
+        <li><strong>Workload efficiency:</strong> avoid plotting unless requested, keep workers/processes isolated, and avoid nested parallelism that competes with scheduler allocations. Large outputs may still require substantial storage; do not promise constant-memory in-memory results.</li>
+        <li><strong>Measurement gate:</strong> compare reference and optimized results on DHFR and small exact cases, then record wall time, peak memory, output size, candidate counts, and truncation behavior on larger multi-conformer and multi-chain inputs. Choose further compiled acceleration only if these measurements justify it; no speculative GPU/distributed execution layer.</li>
+      </ul>
+      <h3>Acceptance evidence</h3>
+      <ul>
+        <li>Demonstrate installation, import without side effects, matching API/CLI results, and compute-only operation on a headless worker.</li>
+        <li>Check PDB/mmCIF equivalence, repeated residue numbers, insertion codes, alternate/shared atoms, selected models, ligands, assembly-copy identity, and opt-in cross-chain contacts.</li>
+        <li>Check threshold equality, path-length boundaries, raw-versus-filtered counts, EOF without a trailing separator, no valid clashes/pathways, and the three-versus-four-residue network boundary.</li>
+        <li>Force a small enumeration limit and verify valid partial exports, explicit status, distinct CLI exit behavior, deterministic stopping, and independent simultaneous output locations.</li>
+        <li>Reproduce DHFR counts and network membership with aligned analysis settings. Investigate any mismatch before accepting optimization results or claiming paper reproduction.</li>
+      </ul>
+      <details class="questions" open>
+        <summary>Unresolved items and evidence needed</summary>
+        <ul>
+          <li><strong>Scientific conflicts:</strong> the paper describes main-chain hydrogen-bond and cysteine exclusions that are not consistently active in the supplied source. Decide how to reconcile documented rules with exact legacy DHFR reproduction after measuring the differences; do not promise both until checked.</li>
+          <li><strong>Resource budgets:</strong> recommend beginning with the legacy approximately one-million-candidate limit, made explicit and configurable. Confirm its exact counting boundary and whether time/memory limits are needed. Maximum pathway length is an analysis setting, not automatically a whole-run truncation.</li>
+          <li><strong>Deployment and performance:</strong> scheduler, worker operating systems, compiler availability, representative input sizes, and throughput/memory targets have not been supplied. These determine packaging and measured performance acceptance, not the agreed external behavior.</li>
+          <li><strong>Reference provenance:</strong> source: van den Bedem et al., Nature Methods (2013), DOI <code>10.1038/nmeth.2592</code>, supplementary CONTACT archive. Code carries the Stanford MIT license; verify redistribution terms for the supplied structure/pathway artifacts and preserve attribution. The archive has been inspected, but the generator has not been compiled or run.</li>
+        </ul>
+      </details>
+    </section>
+  </main>
+</body>
+</html>

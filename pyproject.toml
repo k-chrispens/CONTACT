@@ -2,3 +2,19 @@
 # - Declare compute and optional plotting dependencies.
 # - Expose scheduler-friendly command-line entry point.
 # - Configure repeatable test discovery.
+[build-system]
+requires = ["uv_build>=0.9.28,<0.10.0"]
+build-backend = "uv_build"
+
+[project]
+name = "contact-networks"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = ["networkx>=3", "gemmi>=0.7", "numpy>=1.26"]
+
+[project.optional-dependencies]
+plot = ["matplotlib"]
+dev = ["pytest"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

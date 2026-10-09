@@ -1,2 +1,9 @@
 # - Exclude generated environments and build artifacts.
 # - Exclude platform metadata and test caches.
+.venv/
+build/
+dist/
+*.egg-info/
+__pycache__/
+.pytest_cache/
+.DS_Store
