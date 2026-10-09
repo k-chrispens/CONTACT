@@ -90,3 +90,6 @@ def test_invalid_pathways():
         Pathway([rid(1)], (None,))
     with pytest.raises(ValueError):
         Pathway((rid(1), rid(2)), (None,))
+
+# - Reject mutable nested atom and pathway values.
+# - Reject malformed or residue-only pathway headers.

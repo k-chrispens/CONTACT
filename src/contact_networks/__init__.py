@@ -7,3 +7,6 @@ from .networks import (
 
 # - Declare the package version without side effects.
 __version__ = "0.1.0"
+
+# - Expose staged analysis and serialization helpers.
+# - Expose prepared structure reading without generation.

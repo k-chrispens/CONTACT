@@ -6,6 +6,7 @@
 requires = ["uv_build>=0.9.28,<0.10.0"]
 build-backend = "uv_build"
 
+# - Declare Python package metadata and dependencies.
 [project]
 name = "contact-networks"
 version = "0.1.0"
@@ -16,5 +17,7 @@ dependencies = ["networkx>=3", "gemmi>=0.7", "numpy>=1.26"]
 plot = ["matplotlib"]
 dev = ["pytest"]
 
+# - Expose implemented command-line extraction workflow.
+# - Configure repeatable test discovery.
 [tool.pytest.ini_options]
 testpaths = ["tests"]

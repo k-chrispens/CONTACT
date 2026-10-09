@@ -111,3 +111,6 @@ def test_missing_assembly(tmp_path):
     path = write(fixture(), tmp_path / "plain.cif")
     with pytest.raises(ValueError, match="assembly"):
         read_structure(path, Settings(assembly="missing"))
+
+# - Exclude heavy water without discarding cofactors.
+# - Reject partially unmatched assembly coordinate selectors.

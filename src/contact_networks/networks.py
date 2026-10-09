@@ -7,6 +7,7 @@ from math import isfinite
 import networkx as nx
 from .models import Pathway, ResidueId
 
+# - Validate supported detailed CONTACT headers before parsing.
 # - Finalize detailed records at boundaries and EOF.
 def read_pathways(filename):
     with open(filename, encoding="utf-8", newline="") as stream:
@@ -14,6 +15,7 @@ def read_pathways(filename):
         for line_number, line in enumerate(stream, 1):
             text = line.strip()
             # - Stream records without empty phantom pathways.
+            # - Reject malformed pathway headers instead of guessing.
             if text.startswith("PATH(") or not text:
                 if rows:
                     yield _pathway(rows)

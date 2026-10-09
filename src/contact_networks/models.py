@@ -26,6 +26,7 @@ class Atom:
     element: str
     position: tuple[float, float, float]
     altloc: str = ""
+    # - Reject mutable positions and nonfinite atom coordinates.
 
 # - Represent immutable prepared residue atom groups.
 @dataclass(frozen=True)
@@ -33,6 +34,7 @@ class Residue:
     id: ResidueId
     name: str
     atoms: tuple[Atom, ...]
+    # - Require immutable correctly typed residue atom collections.
 
 # - Represent ordered pathways and relief markers.
 @dataclass(frozen=True)
@@ -60,6 +62,7 @@ class Pathway:
         if any(not _measure(x) for x in self.reliefs[1:]):
             raise ValueError("reliefs must be finite and nonnegative")
 # - Validate optional clash measurements.
+        # - Require immutable two-string conformer transition pairs.
         if any(x is not None and not _measure(x) for x in self.clashes):
             raise ValueError("clashes must be finite and nonnegative")
         if any(len(pair) != 2 or not all(isinstance(x, str) for x in pair) for pair in self.conformers):

@@ -19,6 +19,7 @@ def read_structure(filename, settings):
     # - Preserve original chains and generated copy identity.
     for chain, copy, transform, selected in copies:
         for group in selected:
+            # - Exclude all recognized water including heavy water.
             if group.name.upper() in ("HOH", "WAT"):
                 continue
             identity = ResidueId(model.num, chain.name, group.seqid.num, _empty(group.seqid.icode), copy)
@@ -43,6 +44,7 @@ def _copies(structure, model, assembly_id):
     if len(assemblies) != 1:
         raise ValueError(f"expected one assembly named {assembly_id!r}")
     copies = []
+    # - Reject unmatched explicit assembly chain and subchain selectors.
     # - Expand chain and mmCIF subchain selections.
     for generator_index, generator in enumerate(assemblies[0].generators):
         for chain_index, chain in enumerate(model):
