@@ -8,6 +8,11 @@ import networkx as nx
 from .models import Pathway, ResidueId
 
 # - Validate supported detailed CONTACT headers before parsing.
+DETAILED_HEADER = (
+    "PATH(ModelNo, ChainID, SeqNum(InsertionCode), AltLoc (clash) --> AltLoc (relief), "
+    "clash with prvs, relief, clash atom (prvs rsd), clash atom (current rsd)"
+)
+
 # - Finalize detailed records at boundaries and EOF.
 def read_pathways(filename):
     with open(filename, encoding="utf-8", newline="") as stream:
@@ -16,6 +21,8 @@ def read_pathways(filename):
             text = line.strip()
             # - Stream records without empty phantom pathways.
             # - Reject malformed pathway headers instead of guessing.
+            if text.startswith("PATH") and " ".join(text.split()) != DETAILED_HEADER:
+                raise ValueError(f"line {line_number}: unsupported detailed CONTACT header")
             if text.startswith("PATH(") or not text:
                 if rows:
                     yield _pathway(rows)

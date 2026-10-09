@@ -12,7 +12,8 @@ def path(*numbers, relief=1.0):
     return Pathway(tuple(rid(n) for n in numbers), (None,) + (relief,) * (len(numbers) - 1))
 
 # - Build actual legacy detailed-pathway input records.
-HEADER = "PATH(ModelNo, ChainID, SeqNum(InsertionCode), AltLoc, clash, relief, atoms, atoms)\n"
+HEADER = ("PATH(ModelNo, ChainID, SeqNum(InsertionCode), AltLoc (clash) --> AltLoc (relief), "
+          "clash with prvs, relief, clash atom (prvs rsd), clash atom (current rsd)\n")
 
 def record(number, relief=0, chain="A", insertion=""):
     return f"1, {chain}, {number}({insertion}), A --> B, 0.8, {relief}, CA, CB\n"
@@ -92,4 +93,18 @@ def test_invalid_pathways():
         Pathway((rid(1), rid(2)), (None,))
 
 # - Reject mutable nested atom and pathway values.
+def test_deeply_immutable_records():
+    from contact_networks import Atom, Residue
+    with pytest.raises(TypeError):
+        Atom("CA", "C", [0, 0, 0])
+    atom = Atom("CA", "C", (0, 0, 0))
+    with pytest.raises(TypeError):
+        Residue(rid(1), "ALA", [atom])
+    with pytest.raises(ValueError):
+        Pathway((rid(1),), (None,), (["A", "B"],))
+
 # - Reject malformed or residue-only pathway headers.
+@pytest.mark.parametrize("header", ["PATH(not-the-legacy-header)", "PATH(ModelNo, ChainID, SeqNum(InsertionCode), AltLoc):"])
+def test_invalid_headers(tmp_path, header):
+    with pytest.raises(ValueError, match="header"):
+        read_text(tmp_path, header + "\n" + record(1))

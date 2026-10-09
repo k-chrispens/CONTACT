@@ -113,4 +113,24 @@ def test_missing_assembly(tmp_path):
         read_structure(path, Settings(assembly="missing"))
 
 # - Exclude heavy water without discarding cofactors.
+def test_heavy_water(tmp_path):
+    structure = fixture()
+    residue = structure[0][0][0].clone()
+    residue.name, residue.seqid = "DOD", gemmi.SeqId(101, " ")
+    structure[0][0].add_residue(residue)
+    selected = read_structure(write(structure, tmp_path / "heavy.cif"), Settings())
+    assert all(residue.name != "DOD" for residue in selected)
+
 # - Reject partially unmatched assembly coordinate selectors.
+@pytest.mark.parametrize("subchains", [False, True])
+def test_partial_assembly_selection(tmp_path, subchains):
+    structure = assembly_fixture(subchains)
+    generator = structure.assemblies[0].generators[0]
+    if subchains:
+        generator.subchains = ["Ax", "missing"]
+    else:
+        generator.chains = ["A", "Z"]
+    # - Verify missing selectors cannot produce partial assemblies.
+    path = write(structure, tmp_path / ("incomplete.cif" if subchains else "incomplete.pdb"))
+    with pytest.raises(ValueError, match="selectors"):
+        read_structure(path, Settings(assembly="1"))

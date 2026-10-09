@@ -27,6 +27,13 @@ class Atom:
     position: tuple[float, float, float]
     altloc: str = ""
     # - Reject mutable positions and nonfinite atom coordinates.
+    def __post_init__(self):
+        if not isinstance(self.position, tuple) or len(self.position) != 3:
+            raise TypeError("atom position must be an immutable coordinate triple")
+        if not all(isinstance(x, Real) and not isinstance(x, bool) and isfinite(x) for x in self.position):
+            raise ValueError("atom coordinates must be finite real numbers")
+        if not all(isinstance(x, str) for x in (self.name, self.element, self.altloc)) or not self.name or not self.element:
+            raise ValueError("atom names, elements and altloc must be strings")
 
 # - Represent immutable prepared residue atom groups.
 @dataclass(frozen=True)
@@ -35,6 +42,13 @@ class Residue:
     name: str
     atoms: tuple[Atom, ...]
     # - Require immutable correctly typed residue atom collections.
+    def __post_init__(self):
+        if not isinstance(self.id, ResidueId) or not isinstance(self.atoms, tuple):
+            raise TypeError("residue requires immutable identity and atom tuple")
+        if not self.atoms or not all(isinstance(atom, Atom) for atom in self.atoms):
+            raise ValueError("residue requires nonempty Atom records")
+        if not isinstance(self.name, str) or not self.name:
+            raise ValueError("residue name must be a nonempty string")
 
 # - Represent ordered pathways and relief markers.
 @dataclass(frozen=True)
@@ -65,7 +79,7 @@ class Pathway:
         # - Require immutable two-string conformer transition pairs.
         if any(x is not None and not _measure(x) for x in self.clashes):
             raise ValueError("clashes must be finite and nonnegative")
-        if any(len(pair) != 2 or not all(isinstance(x, str) for x in pair) for pair in self.conformers):
+        if any(not isinstance(pair, tuple) or len(pair) != 2 or not all(isinstance(x, str) for x in pair) for pair in self.conformers):
             raise ValueError("conformer pairs must contain two strings")
         if len({item.model for item in self.residues}) != 1:
             raise ValueError("a pathway cannot mix structural models")
