@@ -1,0 +1,2 @@
+# - Exclude generated environments and build artifacts.
+# - Exclude platform metadata and test caches.

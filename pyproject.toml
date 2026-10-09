@@ -1,0 +1,4 @@
+# - Package modern Python CONTACT analysis.
+# - Declare compute and optional plotting dependencies.
+# - Expose scheduler-friendly command-line entry point.
+# - Configure repeatable test discovery.
