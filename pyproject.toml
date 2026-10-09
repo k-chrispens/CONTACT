@@ -18,6 +18,9 @@ plot = ["matplotlib"]
 dev = ["pytest"]
 
 # - Expose implemented command-line extraction workflow.
+[project.scripts]
+contact-networks = "contact_networks.cli:main"
+
 # - Configure repeatable test discovery.
 [tool.pytest.ini_options]
 testpaths = ["tests"]
