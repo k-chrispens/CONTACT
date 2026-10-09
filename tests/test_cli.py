@@ -38,3 +38,5 @@ def test_import_and_module_entry_point():
     assert subprocess.run([sys.executable, "-c", code], capture_output=True).returncode == 0
     command = subprocess.run([sys.executable, "-m", "contact_networks", "--help"], capture_output=True)
     assert command.returncode == 0 and b"extract" in command.stdout
+
+# - Preserve source truncation when model selection is empty.

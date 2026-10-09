@@ -160,3 +160,4 @@ also requested an explicit finite-coordinate acceptance criterion, documented
 above and covered by tests. No review result is a claim of exhaustive correctness.
 
 <!-- - Verify installed wheel imports and upstream attribution. -->
+<!-- - Clarify source truncation versus selected model completeness. -->
