@@ -11,6 +11,7 @@ build-backend = "uv_build"
 name = "contact-networks"
 version = "0.1.0"
 requires-python = ">=3.11"
+# - Preserve upstream legal notices in built distributions.
 dependencies = ["networkx>=3", "gemmi>=0.7", "numpy>=1.26"]
 
 [project.optional-dependencies]

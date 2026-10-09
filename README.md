@@ -158,3 +158,5 @@ selection. These were fixed in `74abba3`, with regression tests and two fresh
 reviewers reporting no further findings in that fix. The outline-stage review
 also requested an explicit finite-coordinate acceptance criterion, documented
 above and covered by tests. No review result is a claim of exhaustive correctness.
+
+<!-- - Verify installed wheel imports and upstream attribution. -->
