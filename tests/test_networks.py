@@ -110,3 +110,10 @@ def test_invalid_headers(tmp_path, header):
         read_text(tmp_path, header + "\n" + record(1))
 
 # - Require explicit flags for chemically excluded relief.
+def test_excluded_relief_is_not_a_fabricated_measurement():
+    candidate = Pathway((rid(1), rid(2)), (None, None), relief_exclusions=(False, True))
+    assert filter_pathways([candidate], Settings()) == (candidate,)
+    with pytest.raises(ValueError):
+        Pathway((rid(1), rid(2)), (None, None))
+    with pytest.raises(ValueError):
+        Pathway((rid(1), rid(2)), (None, 1), relief_exclusions=(False, True))

@@ -58,13 +58,14 @@ class Pathway:
     conformers: tuple[tuple[str, str], ...] = ()
     clashes: tuple[float | None, ...] = ()
     # - Distinguish absent contacts from missing relief measurements.
+    relief_exclusions: tuple[bool, ...] = ()
 
 # - Validate aligned finite pathway records.
 # - Reject absent or mismatched residue sequences.
     def __post_init__(self):
         if not isinstance(self.residues, tuple) or not all(isinstance(item, ResidueId) for item in self.residues):
             raise TypeError("residues must be an immutable ResidueId tuple")
-        if not all(isinstance(value, tuple) for value in (self.reliefs, self.conformers, self.clashes)):
+        if not all(isinstance(value, tuple) for value in (self.reliefs, self.conformers, self.clashes, self.relief_exclusions)):
             raise TypeError("pathway fields must be immutable tuples")
         n = len(self.residues)
         if not n or len(self.reliefs) != n or self.reliefs[0] is not None:
@@ -74,10 +75,17 @@ class Pathway:
             raise ValueError("conformers must align")
         if self.clashes and len(self.clashes) != n:
             raise ValueError("clashes must align")
-        if any(not _measure(x) for x in self.reliefs[1:]):
-            raise ValueError("reliefs must be finite and nonnegative")
 # - Validate optional clash measurements.
         # - Validate chemically excluded relief markers without invented values.
+        if self.relief_exclusions and (len(self.relief_exclusions) != n or self.relief_exclusions[0]):
+            raise ValueError("relief exclusions must align with a non-excluded start")
+        if any(type(flag) is not bool for flag in self.relief_exclusions):
+            raise TypeError("relief exclusion flags must be boolean")
+        flags = self.relief_exclusions or (False,) * n
+        for value, excluded in zip(self.reliefs[1:], flags[1:]):
+            if (excluded and value is not None) or (not excluded and not _measure(value)):
+                raise ValueError("relief must be measured or explicitly chemically excluded")
+        # - Preserve finite measurements and immutable conformer pairs.
         # - Require immutable two-string conformer transition pairs.
         if any(x is not None and not _measure(x) for x in self.clashes):
             raise ValueError("clashes must be finite and nonnegative")

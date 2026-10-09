@@ -74,7 +74,8 @@ def filter_pathways(paths, settings):
     return tuple(
         path for path in paths
         if len(path.residues) > settings.min_pathway_length
-        and all(value >= settings.relief_threshold for value in path.reliefs[1:])
+        and all(flag or value >= settings.relief_threshold for value, flag in
+                zip(path.reliefs[1:], (path.relief_exclusions or (False,) * len(path.reliefs))[1:]))
         and (not selected or any(item in selected for item in path.residues))
     )
 

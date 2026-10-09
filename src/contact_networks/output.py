@@ -31,6 +31,7 @@ def _pathway_data(pathway):
     return {"residues": [_residue_data(r) for r in pathway.residues],
             "reliefs": list(pathway.reliefs),
             "conformers": [list(pair) for pair in pathway.conformers],
+            "relief_exclusions": list(pathway.relief_exclusions or (False,) * len(pathway.residues)),
             "clashes": list(pathway.clashes) if pathway.clashes is not None else None}
 
 
@@ -117,7 +118,9 @@ def _aligned_rows(pathways, label):
                          "residue_id": _residue_id(residue),
                          "conformers": json.dumps(p.conformers[step - 1])
                          if p.conformers and p.conformers[step - 1] is not None else "",
-                         "clash": _blank(p.clashes, step), "relief": _blank(p.reliefs, step)})
+                         # - Preserve both measurement and exclusion provenance.
+                         "clash": _blank(p.clashes, step), "relief": _blank(p.reliefs, step),
+                         "relief_excluded": p.relief_exclusions[step - 1] if p.relief_exclusions else False})
     return rows
 
 
@@ -158,9 +161,9 @@ def write_results(result, destination, plots=False):
     payload = json.dumps(document, indent=2, sort_keys=True, allow_nan=False) + "\n"
     destination.mkdir(parents=True, exist_ok=False)
     raw, accepted = result.raw_pathways, result.pathways
-    _write_csv(destination / "raw_pathways.csv", ("path_id", "step", "residue_id", "conformers", "clash", "relief"),
+    _write_csv(destination / "raw_pathways.csv", ("path_id", "step", "residue_id", "conformers", "clash", "relief", "relief_excluded"),
                _aligned_rows(raw, "raw"))
-    _write_csv(destination / "pathways.csv", ("path_id", "step", "residue_id", "conformers", "clash", "relief"),
+    _write_csv(destination / "pathways.csv", ("path_id", "step", "residue_id", "conformers", "clash", "relief", "relief_excluded"),
                _aligned_rows(accepted, "accepted"))
     _write_csv(destination / "residues.csv", ("node_id", "model", "chain", "number", "insertion", "copy", "raw_occurrences", "network_id"),
                document["nodes"])
