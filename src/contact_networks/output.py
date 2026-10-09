@@ -26,6 +26,7 @@ def _residue_id(residue):
 
 
 # - Export aligned pathway measurements without losing zero.
+    # - Serialize explicit chemically excluded relief decisions.
 def _pathway_data(pathway):
     return {"residues": [_residue_data(r) for r in pathway.residues],
             "reliefs": list(pathway.reliefs),
@@ -107,6 +108,7 @@ def _write_csv(path, header, rows):
 
 
 # - Export residue occurrences and weighted network edges.
+    # - Keep excluded-contact flags aligned in CSV records.
 def _aligned_rows(pathways, label):
     rows = []
     for index, p in enumerate(pathways, 1):

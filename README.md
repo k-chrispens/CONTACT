@@ -167,3 +167,6 @@ above and covered by tests. No review result is a claim of exhaustive correctnes
 Wheel tests verify the complete upstream notice and `License-File` metadata
 are present in built distributions, not only in this source checkout.
 <!-- - Clarify source truncation versus selected model completeness. -->
+
+<!-- - Document corrected chemistry and state-transition criteria. -->
+<!-- - Separate historical references from corrected generation results. -->

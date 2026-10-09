@@ -108,3 +108,5 @@ def test_deeply_immutable_records():
 def test_invalid_headers(tmp_path, header):
     with pytest.raises(ValueError, match="header"):
         read_text(tmp_path, header + "\n" + record(1))
+
+# - Require explicit flags for chemically excluded relief.

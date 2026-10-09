@@ -57,6 +57,7 @@ class Pathway:
     reliefs: tuple[float | None, ...]
     conformers: tuple[tuple[str, str], ...] = ()
     clashes: tuple[float | None, ...] = ()
+    # - Distinguish absent contacts from missing relief measurements.
 
 # - Validate aligned finite pathway records.
 # - Reject absent or mismatched residue sequences.
@@ -76,6 +77,7 @@ class Pathway:
         if any(not _measure(x) for x in self.reliefs[1:]):
             raise ValueError("reliefs must be finite and nonnegative")
 # - Validate optional clash measurements.
+        # - Validate chemically excluded relief markers without invented values.
         # - Require immutable two-string conformer transition pairs.
         if any(x is not None and not _measure(x) for x in self.clashes):
             raise ValueError("clashes must be finite and nonnegative")
