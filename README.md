@@ -60,6 +60,10 @@ Exit codes: **0** complete, **1** input/export error, **2** command-line usage
 error, **3** truncated. When importing known incomplete upstream output, use
 `--input-status truncated --stopping-reason "upstream enumeration limit"`.
 This records existing truncation; it does not impose a new enumeration limit.
+The manifest's `status_scope` is `source_input`. An empty selected-model subset
+does not establish that model's enumeration is complete when the source is
+truncated; exit 3 and source truncation are retained even with zero matching
+records. No selected-model completeness is inferred from absence of records.
 
 Each result directory contains `raw_pathways.csv`, `pathways.csv`,
 `residues.csv`, `edges.csv`, `networks.csv`, and a final `results.json` manifest.
@@ -160,4 +164,6 @@ also requested an explicit finite-coordinate acceptance criterion, documented
 above and covered by tests. No review result is a claim of exhaustive correctness.
 
 <!-- - Verify installed wheel imports and upstream attribution. -->
+Wheel tests verify the complete upstream notice and `License-File` metadata
+are present in built distributions, not only in this source checkout.
 <!-- - Clarify source truncation versus selected model completeness. -->

@@ -55,6 +55,7 @@ def to_document(result):
         "source": result.source, "settings": settings,
         "input_kind": result.input_kind, "generation_settings_known": False,
         "version": _version(), "status": result.status,
+        "status_scope": "source_input",
         "stopping_reason": result.stopping_reason, "thresholds": result.thresholds,
         "processed_groups": list(result.processed_groups),
         "counts": {"raw_pathways": len(result.raw_pathways), "accepted_pathways": len(result.pathways),

@@ -40,3 +40,12 @@ def test_import_and_module_entry_point():
     assert command.returncode == 0 and b"extract" in command.stdout
 
 # - Preserve source truncation when model selection is empty.
+def test_partial_source_without_selected_model(tmp_path):
+    source, output = tmp_path / "other-model.txt", tmp_path / "result"
+    source.write_text((HEADER + record(1) + record(2, 0.99)).replace("1, A,", "2, A,"))
+    args = ["extract", str(source), "--output", str(output), "--model", "1",
+            "--input-status", "truncated", "--stopping-reason", "upstream limit"]
+    assert main(args) == 3
+    document = json.loads((output / "results.json").read_text())
+    assert document["counts"]["raw_pathways"] == 0
+    assert document["status"] == "truncated" and document["status_scope"] == "source_input"
