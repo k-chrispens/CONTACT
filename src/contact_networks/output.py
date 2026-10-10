@@ -53,6 +53,7 @@ def to_document(result):
     settings["residue_filter"] = list(settings["residue_filter"])
     # - Serialize parameters, provenance, and completion status.
     # - Scope imported truncation to the source input.
+    # - Identify corrected generation parameters and expanded-state provenance.
     return {
         "source": result.source, "settings": settings,
         "input_kind": result.input_kind, "generation_settings_known": False,

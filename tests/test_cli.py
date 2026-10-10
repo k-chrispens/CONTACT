@@ -49,3 +49,6 @@ def test_partial_source_without_selected_model(tmp_path):
     document = json.loads((output / "results.json").read_text())
     assert document["counts"]["raw_pathways"] == 0
     assert document["status"] == "truncated" and document["status_scope"] == "source_input"
+
+# - Run prepared models through corrected structure analysis.
+# - Preserve generated partial status and ordinary input failures.

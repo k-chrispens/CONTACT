@@ -29,6 +29,7 @@ class Analysis:
             raise ValueError("this stage analyzes detailed pathways only")
 
 # - Analyze prepared structures through pathway generation.
+# - Carry generation thresholds, budgets, and explicit science provenance.
 # - Analyze supplied detailed pathways without regeneration.
 def analyze_pathways(paths, settings=None, *, source="", status="complete", stopping_reason=None,
                      thresholds=None, processed_groups=()):

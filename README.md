@@ -220,6 +220,7 @@ Scientific references:
   historical MMDB 1.23.2.2 build was independently reproduced.
 
 <!-- - Separate historical references from corrected generation results. -->
+<!-- - Document full API, cluster CLI, and corrected measurements. -->
 The historical DHFR test checks imported saved scores and the 157 maximal
 residue sequences. It remains useful for parser/export compatibility, but it
 does **not** validate corrected generation. Corrected cutoff values, pathways,

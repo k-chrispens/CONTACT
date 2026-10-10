@@ -31,3 +31,5 @@ def test_historical_dhfr_artifacts():
     larger = build_graph(accepted, 4)
     assert len(larger) == 41
     assert sorted(map(len, nx.connected_components(larger))) == [4, 8, 13, 16]
+
+# - Validate corrected DHFR generation without changing historical expectations.

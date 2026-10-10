@@ -134,3 +134,6 @@ def test_partial_assembly_selection(tmp_path, subchains):
     path = write(structure, tmp_path / ("incomplete.cif" if subchains else "incomplete.pdb"))
     with pytest.raises(ValueError, match="selectors"):
         read_structure(path, Settings(assembly="1"))
+
+# - Preserve split source-chain parts within shared operator copies.
+# - Report malformed structure input through a consistent boundary.

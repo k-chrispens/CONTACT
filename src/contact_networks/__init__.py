@@ -14,3 +14,5 @@ from .output import to_document, write_results
 
 # - Expose prepared structure reading without generation.
 from .structures import read_structure
+
+# - Expose corrected structure analysis and pathway generation.

@@ -8,6 +8,7 @@ from .networks import read_pathways
 from .output import write_results
 
 # - Expose scientific settings and input selection.
+# - Offer corrected structure analysis alongside pathway import.
 def _parser():
     parser = argparse.ArgumentParser(description="CONTACT analysis; pathway generation is a separate stage")
     command = parser.add_subparsers(dest="command", required=True).add_parser("extract")
@@ -26,6 +27,7 @@ def _parser():
     return parser
 
 # - Dispatch structure or detailed-pathway analysis.
+# - Forward scientific scope and shared generation budgets.
 def main(argv=None):
     args = _parser().parse_args(argv)
     try:
