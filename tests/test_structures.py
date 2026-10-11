@@ -154,3 +154,10 @@ def test_malformed_structure_errors(tmp_path):
         read_structure(path, Settings())
 
 # - Reject empty coordinate documents through the input boundary.
+@pytest.mark.parametrize("suffix", ["pdb", "cif"])
+@pytest.mark.parametrize("contents", ["", " \n\t"])
+def test_empty_coordinate_documents(tmp_path, suffix, contents):
+    path = tmp_path / f"empty.{suffix}"
+    path.write_text(contents)
+    with pytest.raises(ValueError):
+        read_structure(path, Settings())

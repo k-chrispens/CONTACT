@@ -13,7 +13,7 @@ def read_structure(filename, settings):
     # - Normalize empty vendor documents without masking application bugs.
     try:
         structure = gemmi.read_structure(str(filename))
-    except (RuntimeError, ValueError) as error:
+    except (RuntimeError, ValueError, IndexError) as error:
         raise ValueError(f"unable to read prepared structure: {error}") from error
     models = [model for model in structure if model.num == settings.model]
     if len(models) != 1:

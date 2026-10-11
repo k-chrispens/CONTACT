@@ -53,6 +53,11 @@ def test_partial_source_without_selected_model(tmp_path):
 # - Run prepared models through corrected structure analysis.
 # - Preserve generated partial status and ordinary input failures.
 # - Return ordinary failure for empty vendor documents.
+def test_empty_structure_cli_error(tmp_path):
+    source, output = tmp_path / "empty.cif", tmp_path / "result"
+    source.write_text("")
+    assert main(["analyze", str(source), "--output", str(output)]) == 1
+    assert not output.exists()
 from test_analysis import write_cascade
 
 
