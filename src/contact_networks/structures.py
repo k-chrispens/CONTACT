@@ -10,7 +10,10 @@ def _empty(value):
 # - Read PDB and mmCIF with identical semantics.
 def read_structure(filename, settings):
     # - Normalize malformed vendor input errors at the boundary.
-    structure = gemmi.read_structure(str(filename))
+    try:
+        structure = gemmi.read_structure(str(filename))
+    except (RuntimeError, ValueError) as error:
+        raise ValueError(f"unable to read prepared structure: {error}") from error
     models = [model for model in structure if model.num == settings.model]
     if len(models) != 1:
         raise ValueError(f"expected one model numbered {settings.model}")
@@ -61,7 +64,7 @@ def _copies(structure, model, assembly_id):
                 continue
             for operator_index, operator in enumerate(generator.operators):
                 # - Keep source-chain parts in the same assembled copy.
-                copy = f"{assembly_id}:{generator_index}:{operator_index}:{operator.name}:{chain_index}"
+                copy = f"{assembly_id}:{generator_index}:{operator_index}:{operator.name}"
                 copies.append((chain, copy, operator.transform, selected))
     # - Reject empty assembly selections without fallback.
     if not copies:

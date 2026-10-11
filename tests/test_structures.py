@@ -136,4 +136,19 @@ def test_partial_assembly_selection(tmp_path, subchains):
         read_structure(path, Settings(assembly="1"))
 
 # - Preserve split source-chain parts within shared operator copies.
+def test_split_source_chain_parts_share_assembly_copy(tmp_path):
+    structure = assembly_fixture()
+    part = structure[0][0].clone()
+    part[0].seqid, part[0].name = gemmi.SeqId(8, " "), "NAP"
+    structure[0].add_chain(part)
+    residues = read_structure(write(structure, tmp_path / "parts.pdb"), Settings(assembly="1"))
+    assert len(residues) == 4
+    assert len({residue.id.copy for residue in residues}) == 2
+    assert len({residue.id for residue in residues}) == 4
+
 # - Report malformed structure input through a consistent boundary.
+def test_malformed_structure_errors(tmp_path):
+    path = tmp_path / "bad.cif"
+    path.write_text("not a valid coordinate data block")
+    with pytest.raises(ValueError, match="prepared structure"):
+        read_structure(path, Settings())

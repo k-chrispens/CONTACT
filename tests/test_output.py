@@ -8,6 +8,7 @@ import pytest
 
 from contact_networks.analysis import Analysis
 from contact_networks.models import Pathway, ResidueId, Settings
+from contact_networks.networks import maximal_pathways
 from contact_networks.output import to_document, write_results
 
 
@@ -25,7 +26,7 @@ def pathway(*residues, reliefs=None, conformers=(), clashes=()):
 # - Construct explicitly supplied analysis result records.
 def analysis(raw, accepted, graph):
     return Analysis("input.pdb", Settings(), tuple(raw), tuple(accepted), graph,
-                    tuple(), thresholds={"relief": 0.0}, processed_groups=("1",))
+                    maximal_pathways(raw), thresholds={"relief": 0.0}, processed_groups=("1",))
 
 
 # - Exercise chain collisions, zero relief, and copies.

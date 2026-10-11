@@ -52,3 +52,34 @@ def test_partial_source_without_selected_model(tmp_path):
 
 # - Run prepared models through corrected structure analysis.
 # - Preserve generated partial status and ordinary input failures.
+from test_analysis import write_cascade
+
+
+# - Export generated structure analyses with truthful status.
+def test_structure_cli_and_partial_export(tmp_path):
+    source = write_cascade(tmp_path / "cascade.pdb")
+    output = tmp_path / "generated"
+    args = ["analyze", str(source), "--allow-hydrogen-free", "--output", str(output)]
+    assert main(args) == 0
+    document = json.loads((output / "results.json").read_text())
+    assert document["input_kind"] == "structure"
+    assert document["generation_settings_known"] is True
+    # - Confirm partial generation exports and signals truncation.
+    partial = tmp_path / "partial-generated"
+    partial_args = ["analyze", str(source), "--allow-hydrogen-free",
+                    "--max-candidates", "1", "--output", str(partial)]
+    assert main(partial_args) == 3
+    data = json.loads((partial / "results.json").read_text())
+    assert data["candidate_states"] == 1
+    assert data["status_scope"] == "generation"
+    assert data["stopping_reason"]
+
+
+# - Reject malformed and missing generated inputs without export.
+def test_structure_cli_errors_do_not_export(tmp_path):
+    bad = tmp_path / "bad.pdb"
+    bad.write_text("invalid structure\n")
+    for source in (bad, tmp_path / "missing.pdb"):
+        output = tmp_path / (source.stem + "-out")
+        assert main(["analyze", str(source), "--output", str(output)]) == 1
+        assert not output.exists()

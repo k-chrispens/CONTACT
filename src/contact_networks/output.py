@@ -7,7 +7,7 @@ from pathlib import Path
 
 import networkx as nx
 
-from .networks import maximal_pathways, network_pathway_counts
+from .networks import network_pathway_counts
 
 
 # - Sort full residue identities without delimiter collisions.
@@ -48,7 +48,7 @@ def to_document(result):
     components = sorted((sorted(c, key=_residue_key) for c in nx.connected_components(result.graph)),
                        key=lambda c: tuple(_residue_key(n) for n in c))
     membership = {node: f"network_{i:04d}" for i, part in enumerate(components, 1) for node in part}
-    raw_maxima = maximal_pathways(result.raw_pathways)
+    raw_maxima = result.maximal_paths
     settings = asdict(result.settings)
     settings["residue_filter"] = list(settings["residue_filter"])
     # - Serialize parameters, provenance, and completion status.
@@ -56,9 +56,13 @@ def to_document(result):
     # - Identify corrected generation parameters and expanded-state provenance.
     return {
         "source": result.source, "settings": settings,
-        "input_kind": result.input_kind, "generation_settings_known": False,
+        "input_kind": result.input_kind,
+        "generation_settings_known": result.input_kind == "structure",
         "version": _version(), "status": result.status,
-        "status_scope": "source_input",
+        "status_scope": "generation" if result.input_kind == "structure" else "source_input",
+        "candidate_states": result.candidate_states,
+        "science_revision": "contact-corrected-v1" if result.input_kind == "structure" else None,
+        # - Retain original pathway and residue counts.
         "stopping_reason": result.stopping_reason, "thresholds": result.thresholds,
         "processed_groups": list(result.processed_groups),
         "counts": {"raw_pathways": len(result.raw_pathways), "accepted_pathways": len(result.pathways),

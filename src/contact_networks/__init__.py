@@ -9,7 +9,8 @@ from .networks import (
 __version__ = "0.1.0"
 
 # - Expose staged analysis and serialization helpers.
-from .analysis import Analysis, analyze_pathways
+from .analysis import Analysis, analyze, analyze_pathways
+from .engine import Generation, generate_pathways
 from .output import to_document, write_results
 
 # - Expose prepared structure reading without generation.

@@ -1,16 +1,12 @@
 # CONTACT
 
 <!-- - Document staged installation and analysis usage. -->
-## Implemented stage
+## Usage
 
-`contact_networks` is an importable modern Python module for detailed-pathway
-parsing, filtering, weighted residue networks, JSON/CSV exports, and optional
-headless PNGs. It also reads prepared PDB/mmCIF models and optionally expands
-explicit biological assemblies, preserving original chains and distinct copies.
-
-The corrected low-level generator is available as
-`contact_networks.engine.generate_pathways(prepared_residues, settings)`.
-Full structure-analysis API/CLI integration is the next implementation stage.
+`contact_networks` is an importable modern Python module for prepared PDB/mmCIF
+structures → corrected pathways → weighted residue networks → JSON/CSV and
+optional headless PNGs. Optional biological assembly expansion preserves
+original chains and distinct operator copies, including split source-chain parts.
 The existing Python 2 script remains untouched as a historical reference.
 
 ### Install and test
@@ -30,20 +26,23 @@ finite. Models are selected by deposited number, not list position.
 ### Python
 
 ```python
-from contact_networks import analyze_pathways, read_pathways, write_results
-result = analyze_pathways(read_pathways("pathways.txt"))
+from contact_networks import analyze, write_results
+result = analyze("prepared_structure.cif")
 write_results(result, "results/run-001", plots=False)
 ```
 
 `read_structure(path, Settings(model=1, assembly="1"))` reads a selected prepared
-model/assembly; it does not discover pathways. Omitting `assembly` uses supplied
+model/assembly. `generate_pathways(residues, settings)` exposes the low-level
+corrected generator; `analyze_pathways(read_pathways("pathways.txt"))` imports
+existing detailed scores without regenerating them. Omitting `assembly` uses supplied
 coordinates. Unknown assemblies or unmatched explicit chain/subchain selectors
 are errors, never silent partial assemblies.
 
 ### CLI and external schedulers
 
 ```sh
-uv run contact-networks extract pathways.txt --output results/run-001 --plots
+uv run contact-networks analyze prepared_structure.cif --output results/run-001 --plots
+uv run contact-networks extract pathways.txt --output results/imported
 ```
 
 Submit one invocation per input to your scheduler/job array, using distinct
@@ -56,6 +55,13 @@ uv run contact-networks extract pathways.txt --output results/selected \
   --residue '{"model":1,"chain":"A","number":99}'
 ```
 
+Structure analysis additionally supports `--clash-percentile`,
+`--max-pathway-length`, `--max-candidates`, `--side-chain-only`, `--cross-chain`,
+`--assembly ID`, and `--allow-hydrogen-free`. Searches are chain-local by default;
+cross-chain discovery and biological assembly expansion are separately opt-in.
+Minimum pathway length requires strictly more residues than the supplied value;
+maximum pathway length counts transitions.
+
 Exit codes: **0** complete, **1** input/export error, **2** command-line usage
 error, **3** truncated. When importing known incomplete upstream output, use
 `--input-status truncated --stopping-reason "upstream enumeration limit"`.
@@ -64,6 +70,11 @@ The manifest's `status_scope` is `source_input`. An empty selected-model subset
 does not establish that model's enumeration is complete when the source is
 truncated; exit 3 and source truncation are retained even with zero matching
 records. No selected-model completeness is inferred from absence of records.
+For structure analysis, status scope is `generation` and the state budget is
+enforced by the generator itself. JSON records the expanded `candidate_states`,
+completed groups, group-specific cutoffs, known generation parameters, and
+`science_revision: "contact-corrected-v1"`. A complete result is exhaustive within
+its configured chain/model/assembly and transition-length scope.
 
 Each result directory contains `raw_pathways.csv`, `pathways.csv`,
 `residues.csv`, `edges.csv`, `networks.csv`, and a final `results.json` manifest.
@@ -88,6 +99,7 @@ artifacts. Fetch its checksum-pinned public archive explicitly:
 uv run examples/fetch_dhfr.py --output reference/dhfr
 CONTACT_DHFR_REFERENCE=reference/dhfr uv run pytest tests/test_dhfr.py
 uv run contact-networks extract reference/dhfr/pathways.txt --output results/dhfr --plots
+uv run contact-networks analyze reference/dhfr/dhfr.pdb --output results/dhfr-corrected --plots
 ```
 
 The fetcher extracts selected source/reference files only, not bundled
@@ -150,6 +162,16 @@ One local run (Python 3.13.11, NetworkX 3.7; 2,000 four-residue pathways and
 for direct aggregation: approximately 31x faster. Python allocation peaks
 were 71,222 and 104,561 bytes respectively; this is a speed improvement,
 not a demonstrated memory reduction. Re-run on your deployment workload.
+
+```sh
+uv run benchmarks/benchmark_generation.py --copies 100
+```
+
+An independently specified workload of 100 three-residue cascades verifies
+400 completed pathways and 600 expanded states before reporting timings.
+One local run completed in 0.155 seconds with 379,934 Python-tracked peak bytes
+and a 54.4 MB whole-process peak RSS. This is a local CPU measurement, not
+cluster throughput or a native historical-generator comparison.
 
 Implementation is staged as comment-outline commits followed by executable
 commits. Tests enforce bullet comments of at most eight words and code sections
@@ -221,6 +243,19 @@ Scientific references:
 
 <!-- - Separate historical references from corrected generation results. -->
 <!-- - Document full API, cluster CLI, and corrected measurements. -->
+With default parameters, the supplied prepared DHFR structure completed in one
+local run with **19,406 expanded states, 4,800 raw pathways, 260 maximal raw
+residue sequences, and 2,057 accepted pathways**. The retained graph had
+112 residues, 133 weighted edges, and four networks of sizes 102, 4, 3, and 3.
+Chain A's stress cutoff was approximately 0.886573. Low-level generation took
+about 0.60 seconds with a 66.6 MB whole-process peak RSS on the local machine.
+
+These corrected measurements deliberately differ from the saved artifact's
+2,415/157/340 counts and nine networks. The larger inferred network is an
+algorithmic result of the documented corrections, not confirmation of improved
+biological accuracy. The optional corrected DHFR test checks completion,
+provenance, and structural invariants; historical counts remain separate.
+
 The historical DHFR test checks imported saved scores and the 157 maximal
 residue sequences. It remains useful for parser/export compatibility, but it
 does **not** validate corrected generation. Corrected cutoff values, pathways,

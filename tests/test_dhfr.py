@@ -33,3 +33,18 @@ def test_historical_dhfr_artifacts():
     assert sorted(map(len, nx.connected_components(larger))) == [4, 8, 13, 16]
 
 # - Validate corrected DHFR generation without changing historical expectations.
+def test_corrected_dhfr_pipeline():
+    from contact_networks import analyze, to_document
+    directory = os.environ.get("CONTACT_DHFR_REFERENCE")
+    if directory is None:
+        pytest.skip("set CONTACT_DHFR_REFERENCE to downloaded reference directory")
+    result = analyze(Path(directory) / "dhfr.pdb", Settings())
+    assert result.status == "complete"
+    assert result.candidate_states < result.settings.max_candidates
+    assert result.raw_pathways and result.pathways and len(result.graph)
+    # - Distinguish corrected generation from imported historical scores.
+    document = to_document(result)
+    assert document["science_revision"] == "contact-corrected-v1"
+    assert document["generation_settings_known"] is True
+    assert document["status_scope"] == "generation"
+    assert all(len(set(path.residues)) == len(path.residues) for path in result.raw_pathways)
