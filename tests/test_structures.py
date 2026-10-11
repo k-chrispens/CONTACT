@@ -152,3 +152,5 @@ def test_malformed_structure_errors(tmp_path):
     path.write_text("not a valid coordinate data block")
     with pytest.raises(ValueError, match="prepared structure"):
         read_structure(path, Settings())
+
+# - Reject empty coordinate documents through the input boundary.

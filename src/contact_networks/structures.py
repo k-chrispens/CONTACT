@@ -10,6 +10,7 @@ def _empty(value):
 # - Read PDB and mmCIF with identical semantics.
 def read_structure(filename, settings):
     # - Normalize malformed vendor input errors at the boundary.
+    # - Normalize empty vendor documents without masking application bugs.
     try:
         structure = gemmi.read_structure(str(filename))
     except (RuntimeError, ValueError) as error:
